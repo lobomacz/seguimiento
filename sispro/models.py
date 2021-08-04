@@ -33,6 +33,8 @@ class DetalleTabla(TimestampsModel):
 
 	class Meta:
 		ordering = ['tabla', 'id']
+		verbose_name = 'Detalle de Tabla'
+		verbose_name_plural = 'Detalles de Tabla'
 
 
 
@@ -111,7 +113,7 @@ class Contacto(SoftDeletionModel, TimestampsModel):
 	cedula = models.CharField(max_length=14, primary_key=True, help_text='Cédula de identidad sin guiones')
 	nombres = models.CharField(max_length=100)
 	apellidos = models.CharField(max_length=100)
-	comunidad = models.ForeignKey(Comunidad, on_delete=models.RESTRICT)
+	comunidad = models.ForeignKey(Comunidad, on_delete=models.RESTRICT, help_text='Comunidad de residencia')
 	fecha_nacimiento = models.DateField('Fecha de nacimiento')
 	sexo = models.CharField(max_length=1, choices=[('m', 'Masculino'), ('f', 'Femenino')])
 	etnia = models.ForeignKey(DetalleTabla, on_delete=models.SET_NULL, null=True, limit_choices_to=Q(tabla__tabla='etnias'), related_name='contactos_etnias', related_query_name='contacto_etnia')
@@ -182,6 +184,9 @@ class Bono(TimestampsModel):
 	class Meta:
 		ordering = ['tipo', 'nombre']
 
+	def get_absolute_url(self):
+		return reverse('detalle_bono', kwargs={'pk':self.pk})
+
 	def __str__(self):
 		return self.nombre.upper()
 
@@ -202,13 +207,16 @@ class Protagonista(SoftDeletionModel, TimestampsModel):
 	def __str__(self):
 		return "{0} {1}".format(self.nombres.upper(), self.apellidos.upper())
 
+	def get_absolute_url(self):
+		return reverse('detalle_protagonista', kwargs={'pk':self.pk})
+
 	class Meta:
 		ordering = ['apellidos', 'nombres']
 
 
 
 # Tabla de Protagonistas con Bonos/Planes de inversión
-class ProtagonistaBono(models.Model, TimestampsModel):
+class ProtagonistaBono(TimestampsModel, models.Model):
 	""" 
 	Modelo ProtagonistaBono para registro de los Bonos/Planes de inversión
 	entregados a protagonistas.
@@ -218,12 +226,47 @@ class ProtagonistaBono(models.Model, TimestampsModel):
 	bono = models.ForeignKey(Bono, on_delete=models.PROTECT)
 	proyecto = models.ForeignKey(Proyecto, on_delete=models.PROTECT)
 	fecha_recibido = models.DateField(help_text='Fecha en que recibió el Bono/Plan de inversión.')
-	tecnico = models.ForeignKey(Contacto, on_delete=models.RESTRICT, help_text='Técnico que realizó la entrega.')
+	tecnico = models.ForeignKey(Contacto, on_delete=models.RESTRICT, help_text='Técnico que realizó la entrega.', null=True)
 	comunidad = models.ForeignKey(Comunidad, on_delete=models.PROTECT, help_text='Comunidad donde se ejecuta.')
 	coord_x = models.FloatField('Coordenada UTM-X')
-	coord_y = models.ForeignKey('Coordenada UTL-Y')
-	altura = models.IntegerField()
+	coord_y = models.FloatField('Coordenada UTL-Y')
+	altura = models.IntegerField(null=True)
+	observaciones = models.CharField(max_length=500, blank=True, null=True)
+	digitador = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	activo = models.BooleanField(default=True, help_text='Está activo para seguimiento.')
+
+
+	def __str__(self):
+		return "{0} {1}>>{2}>>{3}".format(self.protagonista.nombres.upper(), self.protagonista.apellidos.upper(), self.bono.codigo.upper(), self.fecha_recibido)
+
+
+	def get_absolute_url(self):
+		return reverse('detalle_protagonista_bono', kwargs={'pk':self.pk})
+
+
+	class Meta:
+		ordering = ['protagonista','-fecha_recibido','bono']
+		verbose_name = 'Protagonista con Bono/Plan'
+		verbose_name_plural = 'Protagonistas con Bonos/Planes'
+
+
+# Tabla de Capitalizacion
+class CapitalizacionPlan(TimestampsModel):
+	"""
+	Modelo CapitalizacionBono para registrar la capitalización de los planes de inversión
+	entregados a protagonistas.
+	""" 
+
+	protagonista_bono = models.ForeignKey(ProtagonistaBono, on_delete=models.CASCADE, limit_choices_to=Q(bono__tipo__elemento='plan_inversion'))
+	articulo = models.ForeignKey(DetalleTabla, on_delete=models.RESTRICT, limit_choices_to=Q(tabla__tabla='articulos'), related_name='capitalizaciones_articulos', related_query_name='capitalizacion_articulo')
+	unidad = models.ForeignKey(DetalleTabla, on_delete=models.RESTRICT, limit_choices_to=Q(tabla__tabla='unidades'), related_name='capitalizaciones_unidades', related_query_name='capitalizacion_unidad', help_text='Unidad de Medida')
+	cantidad = models.IntegerField()
+	costo = models.DecimalField('Costo unitario', max_digits=8, decimal_places=2, help_text='Costo en Córdobas(C$)')
+
+	class Meta:
+		ordering = ['protagonista_bono']
+
+
 
 
 

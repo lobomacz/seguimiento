@@ -91,8 +91,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'seguimiento',
-        'USER': 'seguimiento',
-        'PASSWORD': '~{8"5Gy]br}K9c~8',
+        'USER': 'postgres',
+        'PASSWORD': 'madmacz',
+#        'USER': 'seguimiento',
+#        'PASSWORD': '~{8"5Gy]br}K9c~8',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -147,3 +149,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SISPRO_CONF = {
+    'paginas':20
+}
