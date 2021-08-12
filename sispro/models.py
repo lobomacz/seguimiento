@@ -114,7 +114,7 @@ class Contacto(SoftDeletionModel, TimestampsModel):
 	nombres = models.CharField(max_length=100)
 	apellidos = models.CharField(max_length=100)
 	comunidad = models.ForeignKey(Comunidad, on_delete=models.RESTRICT, help_text='Comunidad de residencia')
-	fecha_nacimiento = models.DateField('Fecha de nacimiento')
+	fecha_nacimiento = models.DateField('Fecha de nacimiento', null=True)
 	sexo = models.CharField(max_length=1, choices=[('m', 'Masculino'), ('f', 'Femenino')])
 	etnia = models.ForeignKey(DetalleTabla, on_delete=models.SET_NULL, null=True, limit_choices_to=Q(tabla__tabla='etnias'), related_name='contactos_etnias', related_query_name='contacto_etnia')
 	telefono = models.CharField(max_length=9, help_text='8888-8888', null=True, blank=True)
@@ -157,10 +157,10 @@ class Proyecto(models.Model):
 	codigo = models.CharField('Código', max_length=50)
 	nombre = models.CharField(max_length=200)
 	acronimo = models.CharField('Acrónimo', max_length=45)
-	programa = models.ForeignKey(Programa, on_delete=models.RESTRICT, null=True)
+	programa = models.ForeignKey(Programa, on_delete=models.SET_NULL, null=True, blank=True)
 	sector = models.ForeignKey(DetalleTabla, on_delete=models.RESTRICT, limit_choices_to=Q(tabla__tabla='sectores'))
 	institucion = models.ForeignKey(Institucion, on_delete=models.RESTRICT)
-	contacto = models.ForeignKey(Contacto, on_delete=models.SET_NULL, null=True)
+	contacto = models.ForeignKey(Contacto, on_delete=models.SET_NULL, null=True, blank=True)
 	finalizado = models.BooleanField(default=False)
 
 	def __str__(self):
@@ -202,7 +202,9 @@ class Protagonista(SoftDeletionModel, TimestampsModel):
 	sexo = models.CharField(max_length=1, choices=[('m', 'Masculino'), ('f', 'Femenino')])
 	etnia = models.ForeignKey(DetalleTabla, on_delete=models.RESTRICT, limit_choices_to=Q(tabla__tabla='etnias'))
 	comunidad = models.ForeignKey(Comunidad, on_delete=models.PROTECT)
-	telefono = models.CharField('Teléfono', max_length=9, help_text='8888-8888')
+	telefono = models.CharField('Teléfono', max_length=9, help_text='8888-8888', null=True, blank=True)
+	promotor = models.BooleanField('Es Promotor', default=False)
+	jvc = models.BooleanField('Miembro de JVC', default=False)
 
 	def __str__(self):
 		return "{0} {1}".format(self.nombres.upper(), self.apellidos.upper())
@@ -229,8 +231,8 @@ class ProtagonistaBono(TimestampsModel, models.Model):
 	tecnico = models.ForeignKey(Contacto, on_delete=models.RESTRICT, help_text='Técnico que realizó la entrega.', null=True)
 	comunidad = models.ForeignKey(Comunidad, on_delete=models.PROTECT, help_text='Comunidad donde se ejecuta.')
 	coord_x = models.FloatField('Coordenada UTM-X')
-	coord_y = models.FloatField('Coordenada UTL-Y')
-	altura = models.IntegerField(null=True)
+	coord_y = models.FloatField('Coordenada UTM-Y')
+	altura = models.FloatField()
 	observaciones = models.CharField(max_length=500, blank=True, null=True)
 	digitador = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	activo = models.BooleanField(default=True, help_text='Está activo para seguimiento.')

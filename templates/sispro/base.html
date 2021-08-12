@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>SISPRO</title>
+    {# Carga archivos estaticos #}
+    {% load static %}
+
+    {# Carga de la libreria de etiquetas de bootstrap #}
+    {% load bootstrap4 %}
+
+    <!-- bootstrap -->
+
+    {# Carga del css y javascript de bootstrap #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+
+    {# Para mostrar mensajes errores de django.contrib.messages como alerts de Bootstrap #}
+    {% bootstrap_messages %}
+
+
+    <link rel="stylesheet"
+          href="{% static 'sispro/css/bootstrap-5.0.2/bootstrap.min.css' %}">
+    <!-- carousel -->
+    <link rel="stylesheet"
+          href="{% static 'sispro/css/bootstrap-5.0.2/carousel.css' %}">
+    <!-- fontawesome -->
+    <link rel="stylesheet"
+          href="{% static 'sispro/css/fontawesome-free-5.15.3/css/all.css' %}">
+    <!-- custom -->
+    <link rel="stylesheet"
+          href="{% static 'sispro/css/custom/main.css' %}">
+</head>
+
+<body>
+
+    {% block header %}{% endblock %}
+
+    <main>
+        
+        {% block contenido %}{% endblock %}
+
+        <hr>
+
+    </main>
+
+    {% include './sispro_footer.html' with fecha=fecha %}
+    <script src="{% static 'sispro/js/bootstrap-5.0.2/bootstrap.bundle.min.js' %}"></script>
+
+</body>
+
+</html>

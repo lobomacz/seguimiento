@@ -1,0 +1,94 @@
+{% extends './base.html' %}
+
+{% load bootstrap4 %}
+
+{% load bootstrap_icons %}
+
+
+{% block contenido %}
+
+<div class="container-fluid justify-content-center">
+	<div class="row">
+		<col-1><a data-bs-toggle="tooltip" data-bs-placement="top" title="Editar" href="{% url 'update_protagonista' pk=protagonista.pk %}" class="btn btn-primary">
+			{% bs_icon 'pencil' %}
+		</a></col>
+	</div>
+	<h1 class="display-2">
+		{{ 'protagonista' | upper }}
+	</h1>
+	<div class="row">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title">
+						<p class="display-6">
+							{{ protagonista.nombres | upper }} {{ protagonista.apellidos | upper }}
+						</p>
+					</div>
+					<div class="card-subtitle">
+						<p class="h5">
+							{{ protagonista.cedula | upper }}
+						</p>
+						
+					</div>
+					<div>
+						<p class="d-inline">{{ 'fecha de nacimiento' | upper }}</p>
+						<p class="mx-2 text-muted d-inline">{{ protagonista.fecha_nacimiento | date:'d-m-Y' }}</p>
+					</div>
+					<div>
+						<p class="d-inline">{{ 'sexo' | upper }}</p>
+						<p class="text-muted d-inline mx-2">{{ protagonista.sexo | upper }}</p>
+					</div>
+					<div>
+						<p class="d-inline">{{ 'etnia' | upper }}</p>
+						<p class="d-inline mx-2 text-muted">{{ protagonista.etnia | upper }}</p>
+					</div>
+					<div>
+						<p class="d-inline">{{ 'comunidad' | upper }}</p>
+						<p class="d-inline mx-2 text-muted">{{ protagonista.comunidad | upper }}</p>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr>
+	{% if planes and planes.count > 0 %}
+	<div class="row my-3">
+		<div class="col-8">
+			<p class="display-5">
+				{{ 'planes de inversión' | upper }}
+			</p>
+			<ul class="list-group">
+				{% for plan in planes %}
+				<li class="list-group-item">
+					<a href="{% url 'detalle_plan_inversion' pk=plan.pk %}" class="link-primary">
+						{{ plan | upper }}
+					</a>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	{% endif %}
+	{% if bonos and bonos.count > 0 %}
+	<div class="row">
+		<div class="col-8">
+			<p class="display-5">
+				{{ 'bonos' | upper }}
+			</p>
+			<ul class="list-group">
+				{% for bono in bonos %}
+				<li class="list-group-item">
+					<a href="{% url 'detalle_bono' pk=bono.pk %}" class="link-primary">
+						{{ bono | upper }}
+					</a>
+				</li>
+				{% endfor %}}
+			</ul>
+		</div>
+	</div>
+	{% endif %}
+</div>
+
+{% endblock %}

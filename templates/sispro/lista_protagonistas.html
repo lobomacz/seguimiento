@@ -1,0 +1,97 @@
+{% extends './base.html' %}
+
+{% load bootstrap4 %}
+
+{% load bootstrap_icons %}
+
+{% block header %}
+
+	{% include './sispro_header.html' with ruta=ruta %}
+
+{% endblock %}
+
+{% block contenido %}
+
+<div class="container-fluid">
+	<div class="row">
+		<h1 class="display-2">{{ 'Protagonistas' | upper }}</h1>
+	</div>
+	<div class="row">
+		<div class="col-1">
+			<a href="{% url 'nuevo_protagonista' %}" class="btn btn-primary">
+				{% bs_icon 'plus-lg' %}
+			</a>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-10">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>{{ 'nombres' | upper }}</th>
+						<th>{{ 'apellidos' | upper }}</th>
+						<th>{{ 'comunidad' | upper }}</th>
+						<th>{{ 'etnia' | upper }}</th>
+						<th></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for protagonista in page_obj %}
+
+					<tr class="tr">
+						<td>{{ protagonista.nombres | upper }}</td>
+						<td>{{ protagonista.apellidos | upper }}</td>
+						<td>{{ protagonista.comunidad.nombre | upper  }}</td>
+						<td>{{ protagonista.etnia | upper }}</td>
+						<td class="text-center">
+							<a class="btn btn-outline-success mx-auto" href="{% url 'detalle_protagonista' pk=protagonista.pk %}">
+								{% bs_icon 'eye' %}
+							</a>
+						</td>
+						<td class="text-center">
+							<a href="{% url 'update_protagonista' pk=protagonista.pk %}" class="btn btn-outline-primary mx-auto">
+								{% bs_icon 'pencil' %}
+							</a>
+						</td>
+					</tr>
+
+					{% endfor %}
+				</tbody>
+			</table>
+			<nav aria-label="Navegacion de pagina">
+				<ul class="pagination">
+					{% if page_obj.has_previous %}
+					<li class="page-item">
+						<a href="?page={{ page_obj.previous_page_number }}" class="page-link">Anterior</a>
+					</li>
+					{% endif %}
+					{% for pagina in rango_paginas %}
+						{% if not pagina > 0 %}
+							<li class="page-item">
+								<a href="#" aria-disabled="true" class="page-link pe-none">
+									{{ pagina }}
+								</a>
+							</li>
+						{% else %}
+							{% if page_obj.number == pagina %}
+							<li class="page-item active">
+							{% else %}
+							<li class="page-item">
+							{% endif %}
+								<a href="?page={{ pagina }}" class="page-link">
+									{{ pagina }}
+								</a>
+							</li>
+						{% endif %}
+					{% endfor %}
+					{% if page_obj.has_next %}
+					<li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">Siguiente</a></li>
+					{% endif %}
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

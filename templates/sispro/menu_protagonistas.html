@@ -1,0 +1,31 @@
+{% extends './base.html' %}
+
+{% load bootstrap4 %}
+
+{% block header %}
+	{% include './sispro_header.html' %}
+{% endblock %}
+
+{% block contenido %}
+
+<div class="container-fluid">
+	<div class="row my-5">
+		<div class="col-3 mx-auto">
+			{% buttons %}
+
+			<a href="{% url 'lista_protagonistas' %}" class="btn my-4 w-100 btn-primary btn-lg">
+				{{ 'protagonistas' | upper }}
+			</a>
+			<a href="{% url 'lista_planes_inversion' %}" class="btn my-4 w-100 btn-primary btn-lg">
+				{{ 'planes de inversión' | upper }}
+			</a>
+			<a href="{% url 'lista_bonos' %}" class="btn my-4 w-100 btn-primary btn-lg">
+				{{ 'bonos' | upper }}
+			</a>
+
+			{% endbuttons %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}

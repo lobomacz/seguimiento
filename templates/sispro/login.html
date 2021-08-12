@@ -1,0 +1,45 @@
+{% extends './base.html' %}
+
+{% load static %}
+{% load bootstrap4 %}
+{% load bootstrap_icons %}
+
+{% block contenido %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="form-signin">
+                <form method="post" action="{% url 'login_sispro' %}">
+                    <div>
+                        <img class="mb-4"
+                             src="{% static 'sispro/img/GRACCS.png' %}"
+                             alt=""
+                             width="72"
+                             height="57">
+                        <img class="mb-4"
+                             src="{% static 'sispro/img/INTA.png' %}"
+                             alt=""
+                             width="72"
+                             height="57">
+                        <img class="mb-4"
+                             src="{% static 'sispro/img/MEFCCA.png' %}"
+                             alt=""
+                             width="72"
+                             height="57">
+                    </div>
+                    <h1 class="h3 mb-3 fw-normal">Sistema de seguimiento de la producción</h1>
+                    <h3 class="h5 mb-3 fw-normal">Por favor, ingrese sus credenciales</h3>
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                    <button class="mt-2 w-100 btn btn-lg btn-primary"
+                            type="submit">Aceptar <span>{% bs_icon 'door-open' %}</span></button>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

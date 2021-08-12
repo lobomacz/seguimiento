@@ -1,0 +1,73 @@
+{% load bootstrap_icons %}
+<header>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand text-info"
+               href="index.html">SISPRO</a>
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse"
+                    aria-controls="navbarCollapse"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse"
+                 id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    
+                    {% if usuario.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           aria-current="page"
+                           href="{% url 'inicio_sispro' %}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="#"
+                           tabindex="-1"
+                           aria-disabled="true">Programas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="#"
+                           tabindex="-1"
+                           aria-disabled="true">Proyectos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{% url 'menu_protagonistas' %}"
+                           tabindex="-1"
+                           aria-disabled="true">Protagonistas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="#">Seguimiento</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% if buscar == True %}
+
+                    {% include './campo_buscar.html' with ruta_buscar=ruta %}
+
+                {% endif %}
+                {% if not usuario.is_authenticated %}
+                <a type="button" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                title="Ingresar"
+                   class="btn btn-outline-primary"
+                   href="{% url 'login_sispro' %}">
+                   {% bs_icon 'box-arrow-in-right' %}
+                </a>
+                {% else %}
+                <a type="button" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                title="Salir" 
+                   class="btn btn-outline-primary"
+                   href="{% url 'logout_sispro' %}">
+                   {% bs_icon 'box-arrow-right' %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>

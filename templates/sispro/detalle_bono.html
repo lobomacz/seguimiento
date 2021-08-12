@@ -1,0 +1,72 @@
+{% extends './base.html' %}
+
+{% load bootstrap4 %}
+
+{% load bootstrap_icons %}
+
+{% block contenido %}
+
+<div class="container-fluid">
+	
+	<div class="row">
+		<col-1>
+			{% if tipo == 'plan' %}
+			<a data-bs-toggle="tooltip" data-bs-placement="top" title="Editar" href="{% url 'update_plan_inversion' pk=object.pk %}" class="btn btn-primary">
+			{% elif tipo == 'bono' %}
+			<a data-bs-toggle="tooltip" data-bs-placement="top" title="Editar" href="{% url 'update_bono' pk=object.pk %}" class="btn btn-primary">
+			{% endif %}
+				{% bs_icon 'pencil' %}
+			</a>
+		</col>
+	</div>
+	
+	<h1 class="display-2">
+		{% if tipo == 'plan' %}
+		{{ 'plan de inversión' | upper }}
+		{% elif tipo == 'bono' %}
+		{{ 'bono productivo' | upper }}
+		{% endif %}
+	</h1>
+
+	<div class="row">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-body">
+					<div class="card-title h6">
+						{{ object.bono | upper }}
+					</div>
+					<div class="card-subtitle">
+						{{ 'proyecto' | upper }} <span class="fw-bold" >{{ object.proyecto }}</span>
+					</div>
+					
+					<div>
+						<p class="d-inline">{{ 'entregado a' | upper }}</p>
+						<p class="text-muted d-inline mx-2">{{ object.protagonista | upper }} &mdash; {{ object.protagonista.cedula | upper }}</p>
+					</div>
+					<div>
+						<p class="d-inline">{{ 'Fecha de recibido' | upper }}</p>
+						<p class="text-muted d-inline mx-2">{{ object.fecha_recibido | date:'d-m-Y' }}</p>
+					</div>
+					<div>
+						<p class="d-inline"></p>
+						<p class="text-muted d-inline mx-2"></p>
+					</div>
+					<div>
+						<p class="d-inline"></p>
+						<p class="text-muted d-inline mx-2"></p>
+					</div>
+
+					{% if tipo == 'plan' %}
+					
+					{% elif tipo == 'bono' %}
+					
+					{% endif %}
+
+				</div>
+			</div>
+		</div>
+	</div>	
+	
+</div>
+
+{% endblock %}
