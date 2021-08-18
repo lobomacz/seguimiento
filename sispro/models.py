@@ -205,15 +205,17 @@ class Protagonista(SoftDeletionModel, TimestampsModel):
 	telefono = models.CharField('Teléfono', max_length=9, help_text='8888-8888', null=True, blank=True)
 	promotor = models.BooleanField('Es Promotor', default=False)
 	jvc = models.BooleanField('Miembro de JVC', default=False)
+	digitador = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, default=2)
 
 	def __str__(self):
-		return "{0} {1}".format(self.nombres.upper(), self.apellidos.upper())
+		return "{0} {1} >>> {2}".format(self.nombres.upper(), self.apellidos.upper(), self.cedula.upper())
 
 	def get_absolute_url(self):
 		return reverse('detalle_protagonista', kwargs={'pk':self.pk})
 
 	class Meta:
 		ordering = ['apellidos', 'nombres']
+		verbose_name = 'Protagonista'
 
 
 
@@ -253,7 +255,7 @@ class ProtagonistaBono(TimestampsModel, models.Model):
 
 
 # Tabla de Capitalizacion
-class CapitalizacionPlan(TimestampsModel):
+class CapitalizacionBono(TimestampsModel):
 	"""
 	Modelo CapitalizacionBono para registrar la capitalización de los planes de inversión
 	entregados a protagonistas.
@@ -264,6 +266,7 @@ class CapitalizacionPlan(TimestampsModel):
 	unidad = models.ForeignKey(DetalleTabla, on_delete=models.RESTRICT, limit_choices_to=Q(tabla__tabla='unidades'), related_name='capitalizaciones_unidades', related_query_name='capitalizacion_unidad', help_text='Unidad de Medida')
 	cantidad = models.IntegerField()
 	costo = models.DecimalField('Costo unitario', max_digits=8, decimal_places=2, help_text='Costo en Córdobas(C$)')
+	digitador = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
 
 	class Meta:
 		ordering = ['protagonista_bono']

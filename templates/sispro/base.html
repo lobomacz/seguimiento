@@ -6,25 +6,25 @@
           content="IE=edge">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
-    <title>SISPRO</title>
+    <title>SISPRO &dash; RACCS</title>
     {# Carga archivos estaticos #}
     {% load static %}
 
     {# Carga de la libreria de etiquetas de bootstrap #}
-    {% load bootstrap4 %}
+    {% load django_bootstrap5 %}
 
     <!-- bootstrap -->
 
     {# Carga del css y javascript de bootstrap #}
     {% bootstrap_css %}
-    {% bootstrap_javascript jquery='full' %}
+    {% bootstrap_javascript %}
 
     {# Para mostrar mensajes errores de django.contrib.messages como alerts de Bootstrap #}
     {% bootstrap_messages %}
 
 
-    <link rel="stylesheet"
-          href="{% static 'sispro/css/bootstrap-5.0.2/bootstrap.min.css' %}">
+    <!--<link rel="stylesheet"
+          href="{% static 'sispro/css/bootstrap-5.0.2/bootstrap.min.css' %}">-->
     <!-- carousel -->
     <link rel="stylesheet"
           href="{% static 'sispro/css/bootstrap-5.0.2/carousel.css' %}">
@@ -49,7 +49,7 @@
     </main>
 
     {% include './sispro_footer.html' with fecha=fecha %}
-    <script src="{% static 'sispro/js/bootstrap-5.0.2/bootstrap.bundle.min.js' %}"></script>
+    <!--<script src="{% static 'sispro/js/bootstrap-5.0.2/bootstrap.bundle.min.js' %}"></script>-->
 
 </body>
 

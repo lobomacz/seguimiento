@@ -1,6 +1,6 @@
 {% extends './base.html' %}
 
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% load bootstrap_icons %}
 
@@ -12,10 +12,11 @@
 
 {% block contenido %}
 
-<div class="container-fluid">
+<div class="container-fluid mt-2">
 	<div class="row">
 		<h1 class="display-2">{{ 'Protagonistas' | upper }}</h1>
 	</div>
+
 	<div class="row">
 		<div class="col-1">
 			<a href="{% url 'nuevo_protagonista' %}" class="btn btn-primary">
@@ -23,6 +24,9 @@
 			</a>
 		</div>
 	</div>
+	
+	{% if lista_protagonistas and lista_protagonistas.count > 0 %}
+	
 	<div class="row">
 		<div class="col-10">
 			<table class="table table-bordered">
@@ -63,7 +67,9 @@
 				<ul class="pagination">
 					{% if page_obj.has_previous %}
 					<li class="page-item">
-						<a href="?page={{ page_obj.previous_page_number }}" class="page-link">Anterior</a>
+						<a href="?page={{ page_obj.previous_page_number }}" class="page-link">
+							{% bs_icon 'chevron-left' %}
+						</a>
 					</li>
 					{% endif %}
 					{% for pagina in rango_paginas %}
@@ -86,12 +92,19 @@
 						{% endif %}
 					{% endfor %}
 					{% if page_obj.has_next %}
-					<li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">Siguiente</a></li>
+					<li class="page-item">
+						<a href="?page={{ page_obj.next_page_number }}" class="page-link">
+							{% bs_icon 'chevron-right' %}
+						</a>
+					</li>
 					{% endif %}
 				</ul>
 			</nav>
 		</div>
 	</div>
+	{% else %}
+		{% bootstrap_alert "No hay registros." alert_type="warning" extra_classes="my-3" dismissible=False %}
+	{% endif %}
 </div>
 
 {% endblock %}

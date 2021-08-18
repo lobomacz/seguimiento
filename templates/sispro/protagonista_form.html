@@ -1,0 +1,30 @@
+{% extends './base.html' %}
+
+
+{% load django_bootstrap5 %}
+
+{% load bootstrap_icons %}
+
+{% block header %}
+	{% include './sispro_header.html' %}
+{% endblock %}
+
+{% block contenido %}
+
+<div class="container-fluid">
+	<div class="row justify-content-center">
+		<div class="col-6">
+			<h3 class="display-3">
+				PROTAGONISTA
+			</h3>
+
+			<form method="post" action="{{ url }}">
+				{% csrf_token %}
+				{% bootstrap_form form %}
+				{% bootstrap_button "GUARDAR" button_type="submit" alert_error_type="all" %}
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,13 +1,16 @@
 {% extends './base.html' %}
 
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% load bootstrap_icons %}
 
+{% block header %}
+	{% include './sispro_header.html' %}
+{% endblock %}
 
 {% block contenido %}
 
-<div class="container-fluid justify-content-center">
+<div class="container-fluid mt-4 justify-content-center">
 	<div class="row">
 		<col-1><a data-bs-toggle="tooltip" data-bs-placement="top" title="Editar" href="{% url 'update_protagonista' pk=protagonista.pk %}" class="btn btn-primary">
 			{% bs_icon 'pencil' %}

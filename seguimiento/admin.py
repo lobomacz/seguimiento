@@ -1,11 +1,13 @@
 from django.contrib.admin import AdminSite, ModelAdmin, TabularInline, StackedInline
-from sispro.models import Tabla, DetalleTabla, Municipio, Comunidad, Institucion, Contacto, Programa, Proyecto, Bono
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User, Group, Permission
+from sispro.models import Tabla, DetalleTabla, Municipio, Comunidad, Institucion, Contacto, Programa, Proyecto, Bono, Protagonista
 
 # Registro de modelos administrados
 
 
 #	  _________.___   ___________________ __________ ________   
-#	 /   _____/|   | /   _____/\______   \\______   \\_____  \  
+#	 /   _____/|   | /   _____/\______   \\______   \\_____  \  																																																																																				
 #	 \_____  \ |   | \_____  \  |     ___/ |       _/ /   |   \ 
 #	 /        \|   | /        \ |    |     |    |   \/    |    \
 #	/_______  /|___|/_______  / |____|     |____|_  /\_______  /
@@ -60,6 +62,12 @@ class ProgramaAdmin(ModelAdmin):
 	ordering = ['sector','institucion','nombre']
 
 
+class SisproUserAdmin(UserAdmin):
+	model = User
+
+	
+
+
 sispro_admin = SisproAdmin(name='sisproadmin')
 
 sispro_admin.register(Tabla, TablaAdmin)
@@ -69,5 +77,9 @@ sispro_admin.register(Institucion)
 sispro_admin.register(Contacto) 
 sispro_admin.register(Proyecto)
 sispro_admin.register(Bono)
+sispro_admin.register(Protagonista)
+sispro_admin.register(User, SisproUserAdmin)
+sispro_admin.register(Group)
+sispro_admin.register(Permission)
 
 

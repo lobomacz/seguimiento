@@ -9,7 +9,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, FormView
 from sispro.models import *
-from sispro.forms import LoginForm
+from sispro.forms import LoginForm, ProtagonistaForm
 import datetime
 
 
@@ -21,17 +21,30 @@ PAGINAS = settings.SISPRO_CONF['paginas']
 
 # Vistas genéricas
 
-# Vista genérica para listas
-class SisproListView(LoginRequiredMixin, ListView):
 
-	paginate_by = PAGINAS
+# Clase genérica para crear/editar registros
+class SisproCreateEditView(LoginRequiredMixin):
 
 	def get_context_data(self, **kwargs):
 
 		context = super().get_context_data(**kwargs)
 		context['usuario'] = self.request.user
 		context['fecha'] = datetime.date.today()
-		paginator = self.get_paginator(self.queryset,self.paginate_by)
+
+		return context
+
+
+
+# Vista genérica para listas
+class SisproListView(SisproCreateEditView, ListView):
+
+	paginate_by = PAGINAS
+
+	def get_context_data(self, **kwargs):
+
+		context = super().get_context_data(**kwargs)
+
+		paginator = context['paginator'] # self.get_paginator(self.queryset,self.paginate_by)
 		context['rango_paginas'] = paginator.get_elided_page_range(self.request.GET.get('page', 1),on_each_side=2)
 
 		return context
@@ -39,39 +52,14 @@ class SisproListView(LoginRequiredMixin, ListView):
 
 
 # Vista genérica para detalle de objetos
-class SisproDetailView(LoginRequiredMixin, DetailView):
+class SisproDetailView(SisproCreateEditView, DetailView):
 
 	def get_context_data(self, **kwargs):
 
 		context = super().get_context_data(**kwargs)
-		context['usuario'] = self.request.user
-		context['fecha'] = datetime.date.today()
 
 		return context
 
-
-# Vista genérica para crear registros
-class SisproCreateView(LoginRequiredMixin, CreateView):
-
-	def get_context_data(self, **kwargs):
-
-		context = super().get_context_data(**kwargs)
-		context['usuario'] = self.request.user
-		context['fecha'] = datetime.date.today()
-
-		return context
-
-
-# Vista genérica para editar registros
-class SisproUpdateView(LoginRequiredMixin, UpdateView):
-
-	def get_context_data(self, **kwargs):
-
-		context = super().get_context_data(**kwargs)
-		context['usuario'] = self.request.user
-		context['fecha'] = datetime.date.today()
-
-		return context
 
 
 
@@ -91,11 +79,13 @@ class LoginView(FormView):
 		return context
 
 
-	def form_valid(self,form):
+	def form_valid(self, form):
+
 		data = form.cleaned_data
 		username = data['nombreusuario']
 		password = data['contrasena']
 		usuario = authenticate(self.request, username=username, password=password)
+
 		if usuario is not None:
 			login(self.request, usuario)
 			return super().form_valid(form)
@@ -121,6 +111,21 @@ class InicioView(TemplateView):
 		context = super().get_context_data(**kwargs)
 		context['usuario'] = self.request.user
 		context['fecha'] = datetime.date.today()
+
+		return context
+
+
+# Vista de mensaje de error
+class ErrorView(InicioView):
+
+	template_name = 'sispro/error.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		tipo_error = settings.SISPRO_CONF['tipos-error'][int(self.request.GET.get('t'))]
+		mensaje = settings.SISPRO_CONF['mensajes-error'][self.request.GET.get('m')]
+		context['tipo_error'] = tipo_error.upper()
+		context['mensaje'] = mensaje.upper()
 
 		return context
 
@@ -161,6 +166,14 @@ class DetalleProyectoView(SisproDetailView):
 class MenuProtagonistasView(InicioView):
 
 	template_name = 'sispro/menu_protagonistas.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['url_protagonistas'] = reverse_lazy('lista_protagonistas')
+		context['url_planes_inversion'] = reverse_lazy('lista_planes_inversion')
+		context['url_bonos'] = reverse_lazy('lista_bonos')
+
+		return context
 
 
 
@@ -208,19 +221,52 @@ class DetalleProtagonistaView(SisproDetailView):
 
 
 # Ingreso de Protagonista
-class CreateProtagonistaView(SisproCreateView):
+class CreateProtagonistaView(SisproCreateEditView, CreateView):
 
-	template_name = 'sispro/create_protagonista_form.html'
+	#template_name = 'sispro/create_protagonista_form.html'
 	model = Protagonista
-	fields = '__all__'
+	fields = [
+		'cedula',
+		'nombres',
+		'apellidos',
+		'fecha_nacimiento',
+		'sexo',
+		'etnia',
+		'comunidad',
+		'telefono',
+		'promotor',
+		'jvc'
+		]
+	
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['url'] = reverse_lazy('nuevo_protagonista')
+
+		return context
+
+	def form_valid(self, form):
+		form.instance.digitador = self.request.user
+		return super().form_valid(form)
+
+
 
 
 # Modificación de Protagonista
-class UpdateProtagonistaView(SisproUpdateView):
+class UpdateProtagonistaView(SisproCreateEditView, UpdateView):
 
-	template_name = 'sispro/update_protagonista_form.html'
+	#template_name = 'sispro/update_protagonista_form.html'
 	model = Protagonista
-	exclude = ['cedula']
+	#fields = ['nombres','apellidos','fecha_nacimiento','sexo','etnia','comunidad','telefono','promotor','jvc']
+	form_class = ProtagonistaForm
+
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['url'] = reverse_lazy('update_protagonista', kwargs={'pk':self.kwargs['pk']})
+
+		return context
+
+
 
 
 # Lista de Bonos entregados
@@ -235,7 +281,7 @@ class ListaBonosView(SisproListView):
 		context = super().get_context_data(**kwargs)
 		context['buscar'] = True
 		context['ruta'] = reverse_lazy('lista_filtro_bonos')
-		context['clave_buscar'] = 'cedula'
+		context['tipo'] = 'bono'
 
 		return context
 
@@ -245,7 +291,7 @@ class ListaFiltroBonosView(ListaBonosView):
 
 	def get_queryset(self):
 
-		clave = self.kwargs['cedula'].replace('-','')
+		clave = self.request.GET.get('q').replace('-','')
 
 		return ProtagonistaBono.objects.filter(cedula=clave, bono__tipo__elemento='bono')
 
@@ -266,11 +312,30 @@ class DetalleBonoView(SisproDetailView):
 
 
 # Ingresa entrega de Bono a Protagonista
-class CreateBonoView(SisproCreateView):
+class CreateBonoView(SisproCreateEditView, CreateView):
 
-	template_name = 'sispro/entrega_bono_form.html'
+	#template_name = 'sispro/entrega_bono_form.html'
 	model = ProtagonistaBono
-	exclude = ['digitador']
+	#exclude = ['digitador']
+	fields = [
+		'protagonista',
+		'bono','proyecto',
+		'fecha_recibido',
+		'tecnico',
+		'comunidad',
+		'coord_x',
+		'coord_y',
+		'altura',
+		'observaciones'
+		]
+
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['url'] = reverse_lazy('nuevo_bono')
+		context['tipo'] = 'bono'
+
+		return context
 
 	def form_valid(self, form):
 		form.instance.digitador = self.request.user
@@ -278,11 +343,31 @@ class CreateBonoView(SisproCreateView):
 
 
 # Edita entrega de Bono a Protagonista
-class UpdateBonoView(SisproUpdateView):
+class UpdateBonoView(SisproCreateEditView, UpdateView):
 
-	template_name = 'sispro/update_bono_form.html'
+	#template_name = 'sispro/update_bono_form.html'
 	model = ProtagonistaBono
-	exclude = ['digitador']
+	#exclude = ['digitador']
+	fields = [
+		'protagonista',
+		'bono','proyecto',
+		'fecha_recibido',
+		'tecnico',
+		'comunidad',
+		'coord_x',
+		'coord_y',
+		'altura',
+		'observaciones',
+		'activo'
+		]
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['url'] = reverse_lazy('update_bono', kwargs={'pk':self.kwargs['pk']})
+		context['tipo'] = 'bono'
+
+		return context
+
 
 	def form_valid(self, form):
 		if form.instance.digitador == self.request.user:
@@ -294,16 +379,16 @@ class UpdateBonoView(SisproUpdateView):
 # Lista de Planes de Inversión entregados
 class ListaPlanesInversionView(SisproListView):
 
-	template_name = 'sispro/lista_planes_inversion.html'
+	template_name = 'sispro/lista_bonos.html'
 	queryset = ProtagonistaBono.objects.filter(bono__tipo__elemento='plan de inversion')
-	context_object_name = 'lista_planes'
+	context_object_name = 'lista_bonos'
 
 	def get_context_data(self, **kwargs):
 
 		context = super().get_context_data(**kwargs)
 		context['buscar'] = True
 		context['ruta'] = reverse_lazy('lista_filtro_planes_inversion')
-		context['clave_buscar'] = 'cedula'
+		context['tipo'] = 'plan'
 
 		return context
 
@@ -313,7 +398,7 @@ class ListaFiltroPlanesInversionView(ListaPlanesInversionView):
 
 	def get_queryset(self):
 
-		clave = self.kwargs['cedula'].replace('-','')
+		clave = self.request.GET.get('q').replace('-','')
 
 		return ProtagonistaBono.objects.filter(cedula=clave, bono__tipo__elemento='plan de inversion')
 
@@ -333,11 +418,30 @@ class DetallePlanInversionView(SisproDetailView):
 
 
 # Ingresar entrega de Plan de Inversión a Protagonista
-class CreatePlanInversionView(SisproCreateView):
+class CreatePlanInversionView(SisproCreateEditView, CreateView):
 
-	template_name = 'sispro/entrega_plan_inversion_form.html'
+	#template_name = 'sispro/entrega_plan_inversion_form.html'
 	model = ProtagonistaBono
-	exclude = ['digitador']
+	fields = [
+		'protagonista',
+		'bono','proyecto',
+		'fecha_recibido',
+		'tecnico',
+		'comunidad',
+		'coord_x',
+		'coord_y',
+		'altura',
+		'observaciones'
+		]
+	#exclude = ['digitador']
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['url'] = reverse_lazy('nuevo_plan_inversion')
+		context['tipo'] = 'plan'
+
+		return context
+
 
 	def form_valid(self, form):
 		form.instance.digitador = self.request.user
@@ -345,11 +449,32 @@ class CreatePlanInversionView(SisproCreateView):
 
 
 # Editar entrega de Plan de Inversión a Protagonista
-class UpdatePlanInversionView(SisproUpdateView):
+class UpdatePlanInversionView(SisproCreateEditView, UpdateView):
 
-	template_name = 'sispro/update_plan_inversion_form.html'
+	#template_name = 'sispro/update_plan_inversion_form.html'
 	model = ProtagonistaBono
-	exclude = ['digitador']
+	#exclude = ['digitador']
+	fields = [
+		'protagonista',
+		'bono','proyecto',
+		'fecha_recibido',
+		'tecnico',
+		'comunidad',
+		'coord_x',
+		'coord_y',
+		'altura',
+		'observaciones',
+		'activo'
+		]
+
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['url'] = reverse_lazy('update_plan_inversion', kwargs={'pk':self.kwargs['pk']})
+		context['tipo'] = 'plan'
+
+		return context
+
 
 	def form_valid(self, form):
 		if form.instance.digitador == self.request.user:

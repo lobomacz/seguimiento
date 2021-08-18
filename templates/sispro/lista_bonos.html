@@ -1,0 +1,132 @@
+{% extends './base.html' %}
+
+{% load django_bootstrap5 %}
+
+{% load bootstrap_icons %}
+
+{% block header %}
+	{% include './sispro_header.html' with ruta=ruta %}
+{% endblock %}
+
+{% block contenido %}
+
+<div class="container-fluid mt-2">
+
+	<div class="row">
+		<h1 class="display-2">
+			{% if tipo == 'plan' %}
+			PLANES DE INVERSION
+			{% elif tipo == 'bono' %}
+			BONOS PRODUCTIVOS
+			{% endif %}
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="col-1">
+			{% if tipo == 'plan' %}
+			<a href="{% url 'nuevo_plan_inversion' %}" class="btn btn-primary">
+			{% elif tipo == 'bono' %}
+			<a href="{% url 'nuevo_bono' %}" class="btn btn-primary">
+			{% endif %}
+				{% bs_icon 'plus-lg' %}
+			</a>
+		</div>
+	</div>
+	
+	{% if lista_bonos and lista_bonos.count > 0 %}
+
+	<div class="row">
+		<div class="col-10">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>
+							{% if tipo == 'bono' %}
+							BONO
+							{% else %}
+							PLAN
+							{% endif %}
+						</th>
+						<th>PROTAGONISTA</th>
+						<th>PROYECTO</th>
+						<th>FECHA</th>
+						<th></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for bono in page_obj %}
+					<tr>
+						<td>{{ bono.bono.codigo }}</td>
+						<td>{{ bono.protagonista }}</td>
+						<td>{{ bono.proyecto }}</td>
+						<td>{{ bono.fecha_recibido | date:'d-m-Y' }}</td>
+						<td class="text-center">
+							{% if tipo == 'bono' %}
+							<a href="{% url 'detalle_bono' pk=bono.pk %}" class="btn btn-outline-success">
+							{% elif tipo == 'plan' %}
+							<a href="{% url 'detalle_plan_inversion' pk=bono.pk %}" class="btn btn-outline-success">
+							{% endif %}
+							{% bs_icon 'eye' %}	
+							</a>
+						</td>
+						<td class="text-center">
+							{% if tipo == 'bono' %}
+							<a href="{% url 'update_bono' pk=bono.pk %}" class="btn btn-outline-primary">
+							{% elif tipo == 'plan' %}
+							<a href="{% url 'update_plan_inversion' pk=bono.pk %}" class="btn btn-outline-primary">
+							{% endif %}	
+							{% bs_icon 'pencil' %}
+							</a>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<nav aria-label="Navegacion de pagina">
+				<ul class="pagination">
+					{% if page_obj.has_previous %}
+					<li class="page-item">
+						<a href="?page={{ page_obj.previous_page_number }}" class="page-link">
+							{% bs_icon 'chevron-left' %}
+						</a>
+					</li>
+					{% endif %}
+					{% for pagina in rango_paginas %}
+						{% if not pagina > 0 %}
+							<li class="page-item">
+								<a href="#" aria-disabled="true" class="page-link pe-none">
+									{{ pagina }}
+								</a>
+							</li>
+						{% else %}
+							{% if page_obj.number == pagina %}
+							<li class="page-item active">
+							{% else %}
+							<li class="page-item">
+							{% endif %}
+								<a href="?page={{ pagina }}" class="page-link">
+									{{ pagina }}
+								</a>
+							</li>
+						{% endif %}
+					{% endfor %}
+					{% if page_obj.has_next %}
+					<li class="page-item">
+						<a href="?page={{ page_obj.next_page_number }}" class="page-link">
+							{% bs_icon 'chevron-right' %}
+						</a>
+					</li>
+					{% endif %}
+				</ul>
+			</nav>
+		</div>
+	</div>
+
+	{% else %}
+		{% bootstrap_alert "No hay registros." alert_type="warning" extra_classes="my-3" dismissible=False %}
+	{% endif %}
+</div>
+
+{% endblock %}

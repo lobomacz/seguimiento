@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
-    'bootstrap4',
+    'django_bootstrap5',
     'django_bootstrap_icons',
     'sispro',
 ]
@@ -152,5 +152,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SISPRO_CONF = {
-    'paginas':20
+    'paginas':20,
+    'tipos-error':[
+        'error de validación',
+        'accceso denegado',
+        'permisos de usuario',
+        'propiedad de registro',
+    ],
+    'mensajes-error':{
+        'validacion':"la sesión ha expirado. por favor, ingrese nuevamente con su nombre de usuario y contraseña.",
+        'acceso':"Usted no tiene acceso para ejecutar la operación solicitada.",
+        'permisos':"Su usuario no cuenta con los permisos para realizar la operación solicitada. Consulte con el administrador del sistema.",
+        'propietario':"Usted no es el propietario/digitador del registro. Por este motivo, no tiene permiso de modificación. Consulte con el administrador del sistema.",
+    }
 }
